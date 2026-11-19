@@ -61,6 +61,20 @@ class MappingTestRequest(StrictModel):
     duration: float = Field(default=8.0, ge=0.5, le=300.0)
 
 
+class ManualControlRequest(StrictModel):
+    target_type: Literal["all", "zone", "device", "group"]
+    target_id: str = Field(default="", max_length=200)
+    color: str = "#ffffff"
+    brightness: int = Field(default=100, ge=0, le=100)
+    effect: Literal["solid", "flash", "pulse", "breathe", "rainbow"] = "solid"
+    duration: float = Field(default=3600.0, ge=0.5, le=86400.0)
+
+    @field_validator("color")
+    @classmethod
+    def _colour(cls, value: str) -> str:
+        return normalise_hex(value)
+
+
 class TokenResponse(StrictModel):
     token: str
 
@@ -726,6 +740,43 @@ async def test_static(request: Request, payload: StaticTestRequest) -> dict[str,
         color=payload.color,
         target_scope=payload.target,
         message="Colour test",
+    )
+    context.state.add_overlay(overlay)
+    return {"ok": True, "overlay": overlay.to_dict()}
+
+
+@app.post("/api/control")
+async def manual_control(request: Request, payload: ManualControlRequest) -> dict[str, Any]:
+    context = _ctx(request)
+    devices = context.state.devices()
+    groups = context.state.groups()
+    all_zone_ids = [zone["id"] for device in devices for zone in device.get("zones", [])]
+    if payload.target_type == "all":
+        target_ids = all_zone_ids
+    elif payload.target_type == "zone":
+        target_ids = [payload.target_id] if payload.target_id in all_zone_ids else []
+    elif payload.target_type == "device":
+        target_ids = [
+            zone["id"]
+            for device in devices
+            if device["key"] == payload.target_id
+            for zone in device.get("zones", [])
+        ]
+    else:
+        group = next((item for item in groups if item.id == payload.target_id), None)
+        target_ids = [zone_id for zone_id in (group.zones if group else []) if zone_id in all_zone_ids]
+    if not target_ids:
+        raise HTTPException(status_code=422, detail="The selected target has no addressable LEDs")
+    overlay = AppState.new_overlay(
+        kind="manual",
+        effect=payload.effect,
+        duration=payload.duration,
+        brightness=payload.brightness,
+        priority=80,
+        color=payload.color,
+        message="Manual control",
+        target_scope="all",
+        target_ids=target_ids,
     )
     context.state.add_overlay(overlay)
     return {"ok": True, "overlay": overlay.to_dict()}

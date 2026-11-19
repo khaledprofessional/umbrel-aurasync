@@ -391,7 +391,9 @@ def apply_overlay(
         output.update(rendered)
         return output
 
-    if overlay.target_scope == "managed":
+    if overlay.target_ids is not None:
+        targets = [zone_id for zone_id in overlay.target_ids if zone_id in zones]
+    elif overlay.target_scope == "managed":
         targets = list(frame.keys())
         if not targets:
             targets = list(zones.keys())

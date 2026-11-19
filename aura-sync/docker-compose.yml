@@ -37,7 +37,7 @@ services:
   # AuraSync API, telemetry collector, LED renderer, and webhook receiver
   # ---------------------------------------------------------------------------
   backend:
-    image: ttl.sh/aurasync-backend-khaled-v2:24h
+    image: ttl.sh/aurasync-backend-khaled-v3:24h
     restart: unless-stopped
     init: true
     read_only: true
@@ -62,6 +62,7 @@ services:
       AURASYNC_WEBHOOK_TOKEN: ${APP_AURA_SYNC_WEBHOOK_TOKEN:-}
       AURASYNC_LOG_LEVEL: INFO
       PYTHONDONTWRITEBYTECODE: "1"
+      MALLOC_ARENA_MAX: "2"
       # Harmless on hosts without the NVIDIA runtime; when Umbrel grants GPU
       # access this exposes nvidia-smi and libnvidia-ml for GPU telemetry.
       NVIDIA_VISIBLE_DEVICES: all
@@ -93,7 +94,7 @@ services:
   # Static dashboard + same-origin API proxy
   # ---------------------------------------------------------------------------
   web:
-    image: ttl.sh/aurasync-web-khaled-v2:24h
+    image: ttl.sh/aurasync-web-khaled-v3:24h
     restart: unless-stopped
     read_only: true
     cap_drop:

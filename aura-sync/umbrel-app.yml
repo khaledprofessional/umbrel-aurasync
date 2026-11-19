@@ -4,7 +4,7 @@ storage:
   dataRoot: data
 category: utilities
 name: AuraSync
-version: "1.0.2"
+version: "1.0.3"
 tagline: Telemetry-driven RGB lighting for every LED in your machine
 icon: https://raw.githubusercontent.com/khaledprofessional/umbrel-aurasync/main/aura-sync/icon.svg
 description: >-
@@ -71,5 +71,5 @@ widgets:
       progressLabel: "🟦 Cyan · /mnt/data"
       progress: 0.68
 releaseNotes: >-
-  Matches the umbrelOS neutral glass visual language. Fixes DRAM lighting by explicitly entering Direct mode before writing colours and mounting host /dev so newly loaded I2C nodes are visible immediately.
+  umbrelOS-matched neutral interface, per-zone and global manual colour controls, one-worker nginx and lighter uvicorn runtime, and a forced OpenRGB Direct-mode switch for DRAM lighting.
 submitter: AuraSync

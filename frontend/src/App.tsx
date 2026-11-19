@@ -162,6 +162,8 @@ export default function App() {
 							live={live}
 							onNavigate={navigate}
 							onCreateMapping={startMapping}
+							onChanged={() => void loadBootstrap(true)}
+							notify={notify}
 						/>
 					) : null}
 					{page === 'devices' ? (

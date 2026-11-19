@@ -27,7 +27,7 @@ from .db import Database
 @dataclass(slots=True)
 class Overlay:
     id: str
-    kind: Literal["webhook", "static-test", "mapping-test"]
+    kind: Literal["webhook", "static-test", "mapping-test", "manual"]
     effect: Effect
     brightness: int
     priority: int
@@ -38,6 +38,7 @@ class Overlay:
     message: str | None = None
     target_scope: Literal["managed", "all"] = "managed"
     mapping: Mapping | None = None
+    target_ids: tuple[str, ...] | None = None
     created_at: float = field(default_factory=time.time)
 
     def to_dict(self) -> dict[str, Any]:
@@ -52,6 +53,7 @@ class Overlay:
             "message": self.message,
             "target_scope": self.target_scope,
             "mapping_id": self.mapping.id if self.mapping else None,
+            "target_count": len(self.target_ids) if self.target_ids else None,
             "created_at": self.created_at,
             "expires_at": self.expires_at,
             "remaining": max(0.0, round(self.expires_at - time.time(), 1)),
@@ -221,7 +223,7 @@ class AppState:
     # ------------------------------------------------------------------ helpers
     @staticmethod
     def new_overlay(
-        kind: Literal["webhook", "static-test", "mapping-test"],
+        kind: Literal["webhook", "static-test", "mapping-test", "manual"],
         effect: Effect,
         duration: float,
         brightness: int,
@@ -231,6 +233,7 @@ class AppState:
         message: str | None = None,
         target_scope: Literal["managed", "all"] = "managed",
         mapping: Mapping | None = None,
+        target_ids: list[str] | None = None,
     ) -> Overlay:
         now = time.time()
         return Overlay(
@@ -246,6 +249,7 @@ class AppState:
             message=message,
             target_scope=target_scope,
             mapping=mapping,
+            target_ids=tuple(target_ids) if target_ids else None,
             created_at=now,
         )
 

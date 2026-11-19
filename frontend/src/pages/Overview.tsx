@@ -1,4 +1,4 @@
-import {useEffect, useMemo, useState, type ReactNode} from 'react'
+import {useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode} from 'react'
 import {
 	AlertTriangle,
 	ArrowUpRight,
@@ -26,21 +26,81 @@ import {
 	statusName,
 	timeAgo,
 } from '../lib/util'
+import {del, post, put} from '../lib/api'
 
 interface Props {
 	bootstrap: Bootstrap
 	live: Live | null
 	onNavigate: (page: 'mappings' | 'settings') => void
 	onCreateMapping: (type: TargetType, id: string) => void
+	onChanged: () => void
+	notify: (message: string, tone?: 'success' | 'error' | 'info') => void
 }
 
-export function Overview({bootstrap, live, onNavigate, onCreateMapping}: Props) {
+export function Overview({bootstrap, live, onNavigate, onCreateMapping, onChanged, notify}: Props) {
 	const [history, setHistory] = useState<{cpu: number[]; memory: number[]; temp: number[]; gpu: number[]}>({
 		cpu: [],
 		memory: [],
 		temp: [],
 		gpu: [],
 	})
+	const [brightness, setBrightness] = useState(bootstrap.settings.brightness)
+	const [manualColour, setManualColour] = useState('#ffffff')
+	const restoreBrightness = useRef(bootstrap.settings.brightness || 85)
+
+	useEffect(() => {
+		setBrightness(live?.settings.brightness ?? bootstrap.settings.brightness)
+	}, [live?.settings.brightness, bootstrap.settings.brightness])
+
+	const applyBrightness = async (value: number) => {
+		try {
+			const settings = live?.settings ?? bootstrap.settings
+			await put('/api/settings', {...settings, brightness: value})
+			if (value > 0) restoreBrightness.current = value
+			onChanged()
+		} catch (error) {
+			notify(error instanceof Error ? error.message : 'Could not change brightness', 'error')
+		}
+	}
+
+	const togglePower = async () => {
+		if (brightness > 0) {
+			restoreBrightness.current = brightness
+			setBrightness(0)
+			await applyBrightness(0)
+		} else {
+			const restored = restoreBrightness.current || 85
+			setBrightness(restored)
+			await applyBrightness(restored)
+		}
+	}
+
+	const holdColour = async () => {
+		try {
+			await post('/api/control', {
+				target_type: 'all',
+				target_id: '',
+				color: manualColour,
+				brightness: 100,
+				effect: 'solid',
+				duration: 3600,
+			})
+			notify('Manual colour held for one hour', 'success')
+			onChanged()
+		} catch (error) {
+			notify(error instanceof Error ? error.message : 'Could not apply colour', 'error')
+		}
+	}
+
+	const resumeTelemetry = async () => {
+		try {
+			await del('/api/overlays')
+			notify('Telemetry resumed', 'success')
+			onChanged()
+		} catch (error) {
+			notify(error instanceof Error ? error.message : 'Could not clear overrides', 'error')
+		}
+	}
 
 	useEffect(() => {
 		if (!live) return
@@ -256,6 +316,49 @@ export function Overview({bootstrap, live, onNavigate, onCreateMapping}: Props) 
 				</div>
 
 				<aside className="overview-side">
+					<Card className="side-card quick-controls">
+						<div className="section-head section-head--compact">
+							<div>
+								<div className="eyebrow">Manual control</div>
+								<h3 className="section-title section-title--sm">Lighting</h3>
+							</div>
+							<button type="button" className={`mini-power ${brightness > 0 ? 'is-on' : ''}`} onClick={togglePower} aria-label="Toggle all lights">
+								<span />
+							</button>
+						</div>
+						<div className="quick-controls__row">
+							<span>Brightness</span>
+							<strong>{brightness}%</strong>
+						</div>
+						<input
+							className="range"
+							type="range"
+							min={0}
+							max={100}
+							value={brightness}
+							onChange={(event) => setBrightness(Number(event.target.value))}
+							onPointerUp={() => void applyBrightness(brightness)}
+							onKeyUp={() => void applyBrightness(brightness)}
+							style={{'--range-progress': `${brightness}%`} as CSSProperties}
+							aria-label="Master brightness"
+						/>
+						<div className="quick-controls__hold">
+							<input
+								type="color"
+								value={manualColour}
+								onChange={(event) => setManualColour(event.target.value)}
+								aria-label="Manual colour"
+							/>
+							<Button variant="secondary" size="sm" onClick={holdColour}>
+								Hold 1 hour
+							</Button>
+							<Button variant="quiet" size="sm" onClick={resumeTelemetry}>
+								Resume
+							</Button>
+						</div>
+						<p className="quick-controls__hint">A held colour overrides telemetry until it expires or you resume.</p>
+					</Card>
+
 					<Card className="side-card active-map-card">
 						<div className="eyebrow">Active map</div>
 						<div className="active-map__title">{mode}</div>

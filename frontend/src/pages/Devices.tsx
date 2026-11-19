@@ -62,6 +62,23 @@ export function Devices({bootstrap, live, onCreateMapping, onChanged, notify}: P
 		}
 	}
 
+	const holdZoneColour = async (zoneId: string, colour: string) => {
+		try {
+			await post('/api/control', {
+				target_type: 'zone',
+				target_id: zoneId,
+				color: colour,
+				brightness: 100,
+				effect: 'solid',
+				duration: 3600,
+			})
+			notify('Zone colour held for one hour', 'success')
+			onChanged()
+		} catch (error) {
+			notify(error instanceof Error ? error.message : 'Could not set zone colour', 'error')
+		}
+	}
+
 	const deleteGroup = async () => {
 		if (!pendingDelete) return
 		setBusy(true)
@@ -172,6 +189,7 @@ export function Devices({bootstrap, live, onCreateMapping, onChanged, notify}: P
 							deviceMapping={mappingForDevice(device.key)}
 							onMapZone={(zoneId) => onCreateMapping('zone', zoneId)}
 							onMapDevice={() => onCreateMapping('device', device.key)}
+							onHoldZone={holdZoneColour}
 						/>
 					))}
 				</div>
@@ -265,6 +283,7 @@ function DeviceCard({
 	deviceMapping,
 	onMapZone,
 	onMapDevice,
+	onHoldZone,
 }: {
 	device: Device
 	colors: Record<string, string[]>
@@ -272,6 +291,7 @@ function DeviceCard({
 	deviceMapping: Bootstrap['mappings'][number] | undefined
 	onMapZone: (zoneId: string) => void
 	onMapDevice: () => void
+	onHoldZone: (zoneId: string, colour: string) => void
 }) {
 	return (
 		<Card className="device-card" interactive>
@@ -306,6 +326,7 @@ function DeviceCard({
 							colors={colors[zone.id]}
 							mapped={Boolean(mapping)}
 							onMap={() => onMapZone(zone.id)}
+							onHold={(colour) => onHoldZone(zone.id, colour)}
 						/>
 					)
 				})}
@@ -326,12 +347,15 @@ function ZoneRow({
 	colors,
 	mapped,
 	onMap,
+	onHold,
 }: {
 	zone: Zone
 	colors?: string[]
 	mapped: boolean
 	onMap: () => void
+	onHold: (colour: string) => void
 }) {
+	const [holdColour, setHoldColour] = useState('#ffffff')
 	return (
 		<div className={`zone-row ${mapped ? 'zone-row--mapped' : ''}`}>
 			<div className="zone-row__head">
@@ -341,9 +365,20 @@ function ZoneRow({
 						{zone.type} · {zone.led_count} LEDs
 					</span>
 				</div>
-				<button type="button" className="zone-row__action" onClick={onMap}>
-					{mapped ? 'Edit' : 'Map'}
-				</button>
+				<div className="zone-row__tools">
+					<input
+						type="color"
+						value={holdColour}
+						onChange={(event) => setHoldColour(event.target.value)}
+						aria-label={`Manual colour for ${zone.name}`}
+					/>
+					<button type="button" className="zone-row__action" onClick={() => onHold(holdColour)}>
+						Hold 1h
+					</button>
+					<button type="button" className="zone-row__action" onClick={onMap}>
+						{mapped ? 'Edit' : 'Map'}
+					</button>
+				</div>
 			</div>
 			<LedStrip colors={colors} count={zone.led_count} size="sm" />
 		</div>
