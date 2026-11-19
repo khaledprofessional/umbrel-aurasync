@@ -8,7 +8,7 @@ services:
   # portable device allow-list: bus numbers differ on every machine.
   # ---------------------------------------------------------------------------
   openrgb:
-    image: ghcr.io/${APP_AURA_SYNC_IMAGE_OWNER}/aurasync-openrgb:${APP_AURA_SYNC_IMAGE_TAG}
+    image: ttl.sh/aurasync-openrgb-khaled:24h
     restart: unless-stopped
     privileged: true
     init: true
@@ -36,7 +36,7 @@ services:
   # AuraSync API, telemetry collector, LED renderer, and webhook receiver
   # ---------------------------------------------------------------------------
   backend:
-    image: ghcr.io/${APP_AURA_SYNC_IMAGE_OWNER}/aurasync-backend:${APP_AURA_SYNC_IMAGE_TAG}
+    image: ttl.sh/aurasync-backend-khaled:24h
     restart: unless-stopped
     init: true
     read_only: true
@@ -92,7 +92,7 @@ services:
   # Static dashboard + same-origin API proxy
   # ---------------------------------------------------------------------------
   web:
-    image: ghcr.io/${APP_AURA_SYNC_IMAGE_OWNER}/aurasync-web:${APP_AURA_SYNC_IMAGE_TAG}
+    image: ttl.sh/aurasync-web-khaled:24h
     restart: unless-stopped
     read_only: true
     cap_drop:

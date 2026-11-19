@@ -4,7 +4,7 @@ storage:
   dataRoot: data
 category: utilities
 name: AuraSync
-version: "1.0.0"
+version: "1.0.1"
 tagline: Telemetry-driven RGB lighting for every LED in your machine
 icon: https://raw.githubusercontent.com/khaledprofessional/umbrel-aurasync/main/aura-sync/icon.svg
 description: >-
@@ -70,5 +70,6 @@ widgets:
       subtext: "2.4 TB free"
       progressLabel: "🟦 Cyan · /mnt/data"
       progress: 0.68
-releaseNotes: ""
+releaseNotes: >-
+  Initial installation build. Uses publicly pullable images so the app can be installed before GitHub Container Registry package visibility is updated.
 submitter: AuraSync

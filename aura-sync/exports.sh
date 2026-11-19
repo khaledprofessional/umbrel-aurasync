@@ -2,7 +2,7 @@
 # Change the owner here after forking if the GitHub Actions workflow publishes
 # images under your own GitHub Container Registry namespace.
 export APP_AURA_SYNC_IMAGE_OWNER="khaledprofessional"
-export APP_AURA_SYNC_IMAGE_TAG="1.0.0"
+export APP_AURA_SYNC_IMAGE_TAG="1.0.1"
 
 # Stable per-install secret used to authenticate webhook calls. External
 # services authenticate with: Authorization: Bearer <token>
