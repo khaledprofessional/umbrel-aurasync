@@ -59,6 +59,8 @@ export function Overview({bootstrap, live, onNavigate, onCreateMapping}: Props) 
 	const mode = live?.summary.mode ?? bootstrap.summary.mode
 	const diagnostics = live?.diagnostics ?? bootstrap.diagnostics
 	const warnings = diagnostics.recommendations
+	const smbusWarning =
+		!diagnostics.i2c_dev_loaded || diagnostics.i2c_adapters.length === 0
 	const devices = bootstrap.devices
 
 	const primaryMapping = useMemo(() => {
@@ -72,7 +74,7 @@ export function Overview({bootstrap, live, onNavigate, onCreateMapping}: Props) 
 
 	return (
 		<div className="overview">
-			{warnings.length > 0 ? (
+			{warnings.length > 0 && smbusWarning ? (
 				<div className="notice notice--warning">
 					<div className="notice__icon">
 						<AlertTriangle size={18} />
@@ -100,7 +102,7 @@ export function Overview({bootstrap, live, onNavigate, onCreateMapping}: Props) 
 								<Radio size={12} /> Storage fill · live
 							</div>
 							<div className="hero__headline">
-								<span className="hero__value" style={{color: colour}}>
+								<span className="hero__value">
 									{formatNumber(used, 0)}%
 								</span>
 								<span className="hero__unit">used</span>

@@ -532,13 +532,10 @@ class OpenRGBClient:
     def _ensure_custom_mode(self, device: OpenRGBDevice) -> None:
         if device.index in self._custom_mode:
             return
-        direct_index = next(
-            (i for i, name in enumerate(device.modes) if name.lower() == "direct"),
-            None,
-        )
-        if direct_index is not None and device.active_mode == direct_index:
-            self._custom_mode.add(device.index)
-            return
+        # Always ask the server to enter the controller's Direct mode. Some
+        # controllers (notably Crucial Ballistix DRAM) keep an effect mode
+        # latched until SetCustomMode is called, even when active_mode already
+        # reports Direct in the device description.
         try:
             self._send_packet(device.index, SET_CUSTOM_MODE)
             self._custom_mode.add(device.index)

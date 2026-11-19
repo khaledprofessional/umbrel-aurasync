@@ -20,6 +20,7 @@ services:
       QT_QPA_PLATFORM: offscreen
     volumes:
       - ${APP_DATA_DIR}/data/openrgb:/config
+      - /dev:/dev
       # Read-only host views. OpenRGB itself reads sysfs; the mounted modules
       # directory lets the entrypoint attempt `modprobe i2c-dev` on the host.
       - /sys:/sys:ro
@@ -36,7 +37,7 @@ services:
   # AuraSync API, telemetry collector, LED renderer, and webhook receiver
   # ---------------------------------------------------------------------------
   backend:
-    image: ttl.sh/aurasync-backend-khaled:24h
+    image: ttl.sh/aurasync-backend-khaled-v2:24h
     restart: unless-stopped
     init: true
     read_only: true
@@ -92,7 +93,7 @@ services:
   # Static dashboard + same-origin API proxy
   # ---------------------------------------------------------------------------
   web:
-    image: ttl.sh/aurasync-web-khaled:24h
+    image: ttl.sh/aurasync-web-khaled-v2:24h
     restart: unless-stopped
     read_only: true
     cap_drop:

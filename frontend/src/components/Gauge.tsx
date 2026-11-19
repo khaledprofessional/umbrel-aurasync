@@ -35,7 +35,6 @@ export function RingGauge({
 					strokeLinecap="round"
 					strokeDasharray={`${dash} ${circumference - dash}`}
 					transform={`rotate(-90 ${size / 2} ${size / 2})`}
-					style={{filter: `drop-shadow(0 0 7px ${colour}66)`}}
 				/>
 			</svg>
 			<div className="ring-gauge__center">{children}</div>

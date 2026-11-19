@@ -196,15 +196,19 @@ def test_client_sends_client_name() -> None:
     try:
         client.discover()
         assert any(packet[1] == SET_CLIENT_NAME for packet in server.received)
-        custom = [packet for packet in server.received if packet[1] == SET_CUSTOM_MODE]
-        assert len(custom) == 0
+        deadline = time.monotonic() + 2
+        custom: list[tuple[int, int, bytes]] = []
+        while time.monotonic() < deadline and not custom:
+            custom = [packet for packet in server.received if packet[1] == SET_CUSTOM_MODE]
+            time.sleep(0.02)
+        assert len(custom) == 1
     finally:
         client.close()
         server.stop()
         server.join(2)
 
 
-def test_client_requests_custom_mode_when_direct_is_not_active() -> None:
+def test_client_always_requests_custom_mode() -> None:
     server = FakeOpenRGBServer(build_device_payload(mode_name="Rainbow"))
     server.start()
     client = OpenRGBClient("127.0.0.1", server.port, "AuraSync test")
