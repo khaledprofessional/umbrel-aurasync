@@ -67,7 +67,8 @@ jobs:
           assert manifest["id"] == "aura-sync"
           assert manifest["port"] == 4287
           assert manifest["widgets"][0]["endpoint"].startswith("backend:8000/")
-          assert store["id"] == "aurasync"
+          assert store["id"] == "aura"
+          assert manifest["id"].startswith(store["id"])
           for service in ("openrgb", "backend", "web"):
               assert service in compose["services"], service
           assert compose["services"]["openrgb"]["privileged"] is True

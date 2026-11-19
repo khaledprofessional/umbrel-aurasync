@@ -60,6 +60,15 @@ manifest, replacements = re.subn(
 )
 if replacements != 1:
     raise SystemExit("could not find support in umbrel-app.yml")
+raw_icon = repo_url.replace("https://github.com/", "https://raw.githubusercontent.com/") + "/main/aura-sync/icon.svg"
+manifest, replacements = re.subn(
+    r'^icon: .*$',
+    f'icon: {raw_icon}',
+    manifest,
+    flags=re.MULTILINE,
+)
+if replacements != 1:
+    raise SystemExit("could not find icon in umbrel-app.yml")
 manifest_file.write_text(manifest, encoding="utf-8")
 
 readme = readme_file.read_text(encoding="utf-8").replace(

@@ -6,6 +6,7 @@ category: utilities
 name: AuraSync
 version: "1.0.0"
 tagline: Telemetry-driven RGB lighting for every LED in your machine
+icon: https://raw.githubusercontent.com/khaledprofessional/umbrel-aurasync/main/aura-sync/icon.svg
 description: >-
   AuraSync turns the RGB hardware already inside your umbrelOS server into a live system display.
   It talks to a bundled OpenRGB SDK server to address individual LEDs on RAM sticks, ARGB fan
@@ -28,10 +29,10 @@ description: >-
   not detected, run `sudo modprobe i2c-dev` on the umbrelOS host once and restart the app. See the
   README for Intel/AMD SMBus module names and diagnostics in the dashboard.
 developer: AuraSync
-website: https://github.com/aurasync/umbrel-aurasync
+website: https://github.com/khaledprofessional/umbrel-aurasync
 dependencies: []
-repo: https://github.com/aurasync/umbrel-aurasync
-support: https://github.com/aurasync/umbrel-aurasync/issues
+repo: https://github.com/khaledprofessional/umbrel-aurasync
+support: https://github.com/khaledprofessional/umbrel-aurasync/issues
 port: 4287
 gallery: []
 path: ""
