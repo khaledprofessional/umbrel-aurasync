@@ -94,7 +94,7 @@ services:
   # Static dashboard + same-origin API proxy
   # ---------------------------------------------------------------------------
   web:
-    image: ttl.sh/aurasync-web-khaled-v3:24h
+    image: ttl.sh/aurasync-web-khaled-v4:24h
     restart: unless-stopped
     read_only: true
     cap_drop:

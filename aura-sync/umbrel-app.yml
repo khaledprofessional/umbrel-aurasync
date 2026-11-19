@@ -4,7 +4,7 @@ storage:
   dataRoot: data
 category: utilities
 name: AuraSync
-version: "1.0.3"
+version: "1.0.4"
 tagline: Telemetry-driven RGB lighting for every LED in your machine
 icon: https://raw.githubusercontent.com/khaledprofessional/umbrel-aurasync/main/aura-sync/icon.svg
 description: >-
