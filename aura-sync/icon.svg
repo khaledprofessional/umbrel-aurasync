@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="AuraSync">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="38%" r="75%">
+      <stop offset="0%" stop-color="#12231f"/>
+      <stop offset="62%" stop-color="#090d0e"/>
+      <stop offset="100%" stop-color="#050708"/>
+    </radialGradient>
+    <linearGradient id="ring" x1="110" y1="90" x2="402" y2="422" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#7cf7d4"/>
+      <stop offset="45%" stop-color="#22d3ee"/>
+      <stop offset="75%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#f97316"/>
+    </linearGradient>
+    <linearGradient id="core" x1="180" y1="160" x2="340" y2="360" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#d7fff6"/>
+      <stop offset="100%" stop-color="#5eead4"/>
+    </linearGradient>
+    <filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+      <feGaussianBlur stdDeviation="14" result="b"/>
+      <feColorMatrix in="b" type="matrix" values="0 0 0 0 0  0 0 0 0 0.9  0 0 0 0 0.7  0 0 0 0.7 0"/>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="168" fill="none" stroke="#ffffff" stroke-opacity=".06" stroke-width="1"/>
+  <g filter="url(#glow)" fill="none" stroke-linecap="round">
+    <path d="M256 88a168 168 0 0 1 154 100" stroke="url(#ring)" stroke-width="18"/>
+    <path d="M402 300a168 168 0 0 1-92 110" stroke="url(#ring)" stroke-width="18" opacity=".75"/>
+    <path d="M168 392a168 168 0 0 1-80-142" stroke="url(#ring)" stroke-width="18" opacity=".5"/>
+    <path d="M112 178a168 168 0 0 1 84-74" stroke="url(#ring)" stroke-width="18" opacity=".28"/>
+  </g>
+  <circle cx="256" cy="256" r="74" fill="#07100e" stroke="#7cf7d4" stroke-opacity=".4" stroke-width="2"/>
+  <path d="M256 196l57 112h-31l-26-54-26 54h-31l57-112z" fill="url(#core)"/>
+  <circle cx="256" cy="256" r="116" fill="none" stroke="#7cf7d4" stroke-opacity=".18" stroke-width="1" stroke-dasharray="2 10"/>
+</svg>

@@ -1,0 +1,76 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "master"]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r backend/requirements.txt -r backend/requirements-dev.txt
+      - name: Compile
+        run: python -m compileall -q backend/app
+      - name: Lint
+        run: ruff check backend/app backend/tests
+      - name: Test
+        working-directory: backend
+        run: python -m pytest
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.34.9
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+      - name: Install
+        working-directory: frontend
+        run: pnpm install --frozen-lockfile
+      - name: Build
+        working-directory: frontend
+        run: pnpm run build
+
+  compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Validate manifests and compose structure
+        run: |
+          pip install pyyaml
+          python - <<'PY'
+          import pathlib, yaml
+          manifest = yaml.safe_load(pathlib.Path("aura-sync/umbrel-app.yml").read_text())
+          store = yaml.safe_load(pathlib.Path("umbrel-app-store.yml").read_text())
+          compose = yaml.safe_load(pathlib.Path("aura-sync/docker-compose.yml").read_text())
+          assert manifest["id"] == "aura-sync"
+          assert manifest["port"] == 4287
+          assert manifest["widgets"][0]["endpoint"].startswith("backend:8000/")
+          assert store["id"] == "aurasync"
+          for service in ("openrgb", "backend", "web"):
+              assert service in compose["services"], service
+          assert compose["services"]["openrgb"]["privileged"] is True
+          assert compose["services"]["app_proxy"]["environment"]["APP_PORT"] == 8080
+          print("manifest and compose structure ok")
+          PY

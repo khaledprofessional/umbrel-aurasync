@@ -1,0 +1,73 @@
+manifestVersion: 1.1
+id: aura-sync
+storage:
+  dataRoot: data
+category: utilities
+name: AuraSync
+version: "1.0.0"
+tagline: Telemetry-driven RGB lighting for every LED in your machine
+description: >-
+  AuraSync turns the RGB hardware already inside your umbrelOS server into a live system display.
+  It talks to a bundled OpenRGB SDK server to address individual LEDs on RAM sticks, ARGB fan
+  rings, motherboard headers, GPU logos, strips, and other supported devices.
+
+
+  Map any zone to storage fill, CPU or GPU temperature, CPU or RAM load, a static colour, or off.
+  Group multiple RAM sticks into one long bar or mirror the same gauge across all of them.
+  Storage gauges fill proportionally, shift from cyan and green through amber to orange and red
+  as free space disappears, and can pulse when less than five percent remains.
+
+
+  A token-protected webhook API lets Home Assistant, Jellyfin, qBittorrent, Uptime Kuma, Frigate,
+  and CI pipelines flash or pulse the LEDs for a few seconds, then automatically return to the
+  active telemetry view. Quiet hours dim or switch everything off on a schedule.
+
+
+  OpenRGB needs direct access to the host SMBus/I2C and USB HID devices. The bundled controller
+  container is therefore privileged and tries to load i2c-dev at startup. If your RAM sticks are
+  not detected, run `sudo modprobe i2c-dev` on the umbrelOS host once and restart the app. See the
+  README for Intel/AMD SMBus module names and diagnostics in the dashboard.
+developer: AuraSync
+website: https://github.com/aurasync/umbrel-aurasync
+dependencies: []
+repo: https://github.com/aurasync/umbrel-aurasync
+support: https://github.com/aurasync/umbrel-aurasync/issues
+port: 4287
+gallery: []
+path: ""
+defaultUsername: ""
+defaultPassword: ""
+permissions:
+  - GPU
+widgets:
+  - id: "rgb-status"
+    type: "list-emoji"
+    refresh: "5s"
+    endpoint: "backend:8000/widgets/status"
+    link: ""
+    example:
+      type: "list-emoji"
+      link: ""
+      count: "6"
+      items:
+        - emoji: "🟦"
+          text: "Storage gauge · 6 devices"
+        - emoji: "💾"
+          text: "68% used · 2.4 TB free"
+        - emoji: "⚡"
+          text: "jellyfin.play · 12s ago"
+  - id: "storage"
+    type: "text-with-progress"
+    refresh: "5s"
+    endpoint: "backend:8000/widgets/storage"
+    link: ""
+    example:
+      type: "text-with-progress"
+      link: ""
+      title: "RGB storage gauge"
+      text: "68%"
+      subtext: "2.4 TB free"
+      progressLabel: "🟦 Cyan · /mnt/data"
+      progress: 0.68
+releaseNotes: ""
+submitter: AuraSync
